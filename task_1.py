@@ -30,29 +30,23 @@ class Record:
     def add_phone(self, phone):
         self.phones.append(Phone(phone))
 
-    def remove_phone(self, phone):
-        
-        for index, item in enumerate(self.phones):
-            if item.value == Phone(phone).value:
-                self.phones.pop(index)
-                return
-        raise ValueError(f"Phone number: {phone} not found")
-            
-    def edit_phone(self, old_phone, new_phone):
-
-        for i, item in enumerate(self.phones):
-            if item.value == Phone(old_phone).value:
-                self.phones[i] = Phone(new_phone)
-                return
-        raise ValueError(f"Phone number: {old_phone} not found")
-    
     def find_phone(self, phone):
         result = None
         for item in self.phones:
-            if item.value == Phone(phone).value:
+            if item.value == phone:
                 result = item
-        return result
-                
+        return result        
+
+    def remove_phone(self, phone):
+        self.phones.remove(self.find_phone(phone))
+        
+            
+    def edit_phone(self, old_phone, new_phone):
+        if self.find_phone(old_phone):
+            self.remove_phone(old_phone) 
+            self.add_phone(new_phone)
+        else: raise ValueError(f"Phone number: {old_phone} not found")
+                  
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
@@ -67,16 +61,12 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record 
     
     def find(self, name):
-        result = [self.data[item] for item in self.data if item.lower() == name.lower()]
-        if result: return result[0] 
-        else: return None
+        return self.get(name)
 
     def delete(self, name):
-        self.data ={key: value for key, value in self.data.items() if key.lower() != name.lower()}
+        self.pop(name)
     
-
-        
-
+       
 #-------------------------------------------------------------------
 
 # Створення нової адресної книги
@@ -104,10 +94,12 @@ john = book.find("John")
 john.edit_phone("1234567890", "1112223333")
 
 print(john)  # Виведення: Contact name: John, phones: 1112223333; 5555555555
-
+john.remove_phone("1112223333")
+print(john)
 # Пошук конкретного телефону у записі John
 found_phone = john.find_phone("5555555555")
 print(f"{john.name}: {found_phone}")  # Виведення: John: 5555555555
 
 # Видалення запису Jane
 book.delete("Jane")
+
