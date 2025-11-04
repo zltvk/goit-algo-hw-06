@@ -8,8 +8,7 @@ class Field:
         return str(self.value)
 
 class Name(Field):
-    def __repr__(self):
-        return f'Name(name={self.value})'
+    pass
 
 class Phone(Field):
     def __init__(self, value):
@@ -17,10 +16,7 @@ class Phone(Field):
 
         if not (value.isdigit() and len(value) == 10): 
             raise ValueError(f'Invalid phone number {value}')
-
-    def __repr__(self):
-        return f'Phone(phone={self.value})'
-    
+   
 
 class Record:
     def __init__(self, name):
@@ -38,14 +34,19 @@ class Record:
         return result        
 
     def remove_phone(self, phone):
-        self.phones.remove(self.find_phone(phone))
+        found = self.find_phone(phone)
+        if not found:
+            raise ValueError(f"Phone number: {phone} not found")
+        self.phones.remove(found)
         
             
     def edit_phone(self, old_phone, new_phone):
-        if self.find_phone(old_phone):
-            self.remove_phone(old_phone) 
-            self.add_phone(new_phone)
-        else: raise ValueError(f"Phone number: {old_phone} not found")
+
+        found = self.find_phone(old_phone)
+        if not found:
+            raise ValueError(f"Phone number: {old_phone} not found")
+        index = self.phones.index(found)
+        self.phones[index] = Phone(new_phone)
                   
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
